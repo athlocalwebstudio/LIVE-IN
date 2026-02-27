@@ -33,8 +33,8 @@ const Terms = () => {
           laws of the applicable jurisdiction. By continuing to use this site, you
           acknowledge that you have read, understood, and agreed to these terms in full.
           If you have any questions or concerns, please contact us at{" "}
-          <a href="mailto:tdev162team@gmail.com" className={styles.link}>
-            tdev162team@gmail.com
+          <a href="mailto:athlocalwebstudio@gmail.com" className={styles.link}>
+            athlocalwebstudio@gmail.com
           </a>.
         </p>
       </div>

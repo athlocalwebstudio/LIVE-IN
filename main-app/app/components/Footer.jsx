@@ -30,8 +30,8 @@ const Footer = () => {
                 </div>
                 <div className={styles.footerText}>
                     &copy; {new Date().getFullYear()} LIVE IN.<br></br> Site by
-                        <a href="mailto:tdev162team@gmail.com" className={styles.footerLink}>
-                            TDEV Team
+                        <a href="https://www.athlocalwebstudio.com/" className={styles.footerLink} target="_blank" rel="noopener noreferrer">
+                            LocalWebStudio
                         </a>
                 </div>
             </div>
