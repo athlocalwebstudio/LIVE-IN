@@ -1,18 +1,24 @@
-
 html {
   scroll-behavior: smooth;
-   background-color: #EDFAF8; 
+  background-color: #EDFAF8;
 }
-body{
+
+body {
+  margin: 0;
   overflow-x: hidden;
 }
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 .loaderOverlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: #edfaf8; /* same as your site bg */
+  background: #edfaf8;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -32,3 +38,85 @@ body{
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+
+/* ===== RESPONSIVE FOUNDATION V2 ===== */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  min-width: 300px;
+  background: #EDFAF8;
+}
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+a,
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 3px solid rgba(255, 64, 129, 0.35);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: rgba(255, 64, 129, 0.22);
+}
+
+.loaderOverlay {
+  inset: 0;
+  height: 100dvh;
+  padding: 1rem;
+}
+
+.loader {
+  width: clamp(42px, 7vw, 66px);
+  height: clamp(42px, 7vw, 66px);
+  border-width: clamp(4px, 0.7vw, 7px);
+  border-top-width: clamp(4px, 0.7vw, 7px);
+}
+
+@media (min-width: 1920px) {
+  html { font-size: 17px; }
+}
+
+@media (min-width: 2560px) {
+  html { font-size: 18px; }
+}
+
+@media (min-width: 3400px) {
+  html { font-size: 20px; }
+}
+
+@media (max-width: 480px) {
+  body { min-width: 300px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+

@@ -1,79 +1,128 @@
 .header {
   position: sticky;
   top: 0;
-  background-color: #EDFAF8;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  width: 100%;
+  background:
+    linear-gradient(180deg, rgba(237, 250, 248, 0.97), rgba(237, 250, 248, 0.92));
+  box-shadow: 0 2px 18px rgba(15, 23, 42, 0.08);
   z-index: 50;
+  backdrop-filter: blur(16px);
+  overflow-x: clip;
 }
 
 .nav {
-  max-width: 1200px;
+  width: min(100%, 1200px);
   margin: 0 auto;
-  padding: 1rem 1.5rem;
+  padding: clamp(0.55rem, 1.2vw, 0.95rem) clamp(0.75rem, 2.4vw, 1.5rem);
+  min-height: clamp(64px, 7vw, 82px);
   display: flex;
-  justify-content: center; /* center the middle element */
+  justify-content: center;
   align-items: center;
-  position: relative; /* so we can absolutely position center content */
-  border-radius: 15px;
+  position: relative;
 }
 
 .logoContainer {
   position: absolute;
-  left: 1.5rem; /* keep it on the far left */
+  left: clamp(0.75rem, 2.4vw, 1.5rem);
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .logoImg {
+  width: clamp(46px, 5vw, 66px);
+  height: clamp(46px, 5vw, 66px);
   border-radius: 50%;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  object-fit: cover;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
 }
-
 
 .logoDropdown {
   position: relative;
+  z-index: 250;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Keeps the menu open while the mouse travels from the black pill to the dropdown */
+.logoDropdown::after {
+  content: "";
+  position: absolute;
+  left: -1.25rem;
+  right: -1.25rem;
+  top: 100%;
+  height: 1.25rem;
+  background: transparent;
+  pointer-events: auto;
 }
 
 .logo {
-  font-weight: bold;
-  font-size: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  max-width: min(520px, 58vw);
+  min-height: clamp(42px, 4.4vw, 54px);
+  color: #ffffff;
+  background: #000000;
+  padding: 0 clamp(2.1rem, 6vw, 4.8rem);
+  border-radius: 9999px;
+  font-weight: 900;
+  font-size: clamp(1.08rem, 1.65vw, 1.5rem);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  white-space: nowrap;
   user-select: none;
-  color: white;
-  background-color: black;
-  padding: 0.5rem 5rem; /* vertical + horizontal padding to create cylinder shape */
-  border-radius: 9999px; /* fully rounded pill shape */
-  display: inline-block;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.14);
 }
 
-/* Hide hamburger by default */
+.chevron {
+  width: clamp(0.8rem, 1.35vw, 1rem);
+  height: clamp(0.8rem, 1.35vw, 1rem);
+  margin-left: 0.22rem;
+  flex-shrink: 0;
+}
+
 .hamburger {
   display: none;
-  background: none;
-  border: none;
+  align-items: center;
+  justify-content: center;
+  width: clamp(42px, 7vw, 52px);
+  height: clamp(42px, 7vw, 52px);
+  margin-left: auto;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  border-radius: 16px;
   cursor: pointer;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.07);
 }
 
 .hamburgerIcon {
-  width: 2rem;
-  height: 2rem;
+  width: clamp(24px, 5vw, 32px);
+  height: clamp(24px, 5vw, 32px);
   color: #111;
 }
 
-/* Mobile menu panel */
 .mobileMenu {
   position: absolute;
-  top: 100%;
-  right: 0;
-  left: 0;
-  background: white;
-  border-top: 1px solid #ddd;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-  padding: 1rem;
+  top: calc(100% + 0.4rem);
+  right: clamp(0.75rem, 2.5vw, 1.5rem);
+  left: clamp(0.75rem, 2.5vw, 1.5rem);
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  border-radius: 20px;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+  padding: 0.75rem;
   z-index: 200;
+  backdrop-filter: blur(16px);
 }
 
-.mobileMenu ul {
+.mobileMenu ul,
+.dropdownContent {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -81,196 +130,249 @@
 
 .mobileMenu li a {
   display: block;
-  padding: 0.75rem 0;
+  padding: 0.9rem 1rem;
+  border-radius: 14px;
   color: #111;
   text-decoration: none;
+  font-weight: 800;
 }
 
 .mobileMenu li a:hover {
-  background: #f0f0f0;
-  color: rgba(253, 9, 232, 0.448);
+  background: #fff0f6;
+  color: #ff2f7d;
 }
-
 
 .dropdownContent {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 0.28rem);
   left: 50%;
-  transform: translateX(-50%);
-  background: white;
-  border: 1px solid #ddd;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-  min-width: 150px;
-  list-style: none;
-  padding: 0.5rem 0;
-  margin: 0;
+  min-width: 190px;
+  transform: translateX(-50%) translateY(6px);
+  background: rgba(255, 255, 255, 0.97);
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+  border-radius: 18px;
+  padding: 0.55rem;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease;
   pointer-events: none;
   z-index: 100;
+  backdrop-filter: blur(16px);
 }
 
-.logoDropdown:hover .dropdownContent {
+.logoDropdown:hover .dropdownContent,
+.logoDropdown:focus-within .dropdownContent,
+.dropdownContent:hover {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
-}
-
-.dropdownContent li {
-  padding: 0 1rem;
+  transform: translateX(-50%) translateY(0);
 }
 
 .dropdownContent li a {
   display: block;
-  padding: 0.5rem 0;
+  padding: 0.75rem 0.9rem;
   color: #111;
   text-decoration: none;
+  border-radius: 12px;
+  font-weight: 800;
+  white-space: nowrap;
 }
 
 .dropdownContent li a:hover {
-  background-color: #f0f0f0;
-  color: rgba(253, 9, 232, 0.448)
-}
-.chevron {
-  width: 1rem;
-  height: 1rem;
-  margin-left: 0.4rem;
-}
-/* ====== MEDIA QUERIES ====== */
-
-/* Small phones (≤480px) */
-/* Hide hamburger by default */
-.hamburger {
-  display: none;
-  background: none;
-  border: none;
-  cursor: pointer;
+  background-color: #fff0f6;
+  color: #ff2f7d;
 }
 
-.hamburgerIcon {
-  width: 2rem;
-  height: 2rem;
-  color: #111;
-}
-
-/* Mobile menu panel */
-.mobileMenu {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  left: 0;
-  background: white;
-  border-top: 1px solid #ddd;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-  padding: 1rem;
-  z-index: 200;
-}
-
-.mobileMenu ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.mobileMenu li a {
-  display: block;
-  padding: 0.75rem 0;
-  color: #111;
-  text-decoration: none;
-}
-
-.mobileMenu li a:hover {
-  background: #f0f0f0;
-  color: rgba(253, 9, 232, 0.448);
-}
-
-/* ===== MEDIA QUERIES ===== */
-
-/* Small screens: hide pill, show hamburger */
-/* Phones only: use hamburger, hide pill */
-/* Phones and tablets (≤1024px) */
-@media (max-width: 1024px) {
-  .logoDropdown { display: none; }   /* hide pill */
-  .hamburger { display: block; margin-left: auto; }
-  .nav { justify-content: space-between; }
-  .logoContainer { position: static; }
-  .mobileMenu { display: block; }    /* panel when toggled */
-}
-
-/* Laptops and up (≥1025px) */
 @media (min-width: 1025px) {
-  .hamburger { display: none; }
-  .mobileMenu { display: none; }
-  .logoDropdown { display: block; }  /* pill visible */
-}
+  .hamburger,
+  .mobileMenu {
+    display: none;
+  }
 
+  .logoDropdown {
+    display: flex;
+  }
 
-/* Large desktops (1441px – 1920px) */
-@media (min-width: 1441px) {
-  .nav {
-    max-width: 1400px;
+  .logo {
+    /* Fix for 1440px: keeps text vertically centered inside black pill */
+    height: clamp(44px, 4.1vw, 56px);
+    line-height: 1;
+    padding-top: 0;
+    padding-bottom: 0;
   }
 }
 
-/* Ultra-wide screens (1921px+) */
-@media (min-width: 1921px) {
+@media (min-width: 1440px) {
   .nav {
-    max-width: 1600px;
+    width: min(100%, 1420px);
+    min-height: 84px;
+  }
+
+  .logo {
+    min-width: 290px;
+    height: 56px;
+    font-size: 1.45rem;
   }
 }
-/* Tablets only: prevent horizontal overflow + keep things tight */
-@media (min-width: 768px) and (max-width: 1024px) {
-  /* Let flex children shrink instead of pushing the row wider */
-  .nav > * { min-width: 0; }
 
-  /* Make the nav respect the viewport width and clip any stray overflow */
+@media (min-width: 1920px) {
   .nav {
+    width: min(100%, 1680px);
+    min-height: 94px;
+  }
+
+  .logoImg {
+    width: 72px;
+    height: 72px;
+  }
+
+  .logo {
+    min-width: 340px;
+    height: 64px;
+    font-size: 1.7rem;
+  }
+}
+
+@media (min-width: 2560px) {
+  .nav {
+    width: min(100%, 1980px);
+    min-height: 108px;
+  }
+
+  .logoImg {
+    width: 84px;
+    height: 84px;
+  }
+
+  .logo {
+    min-width: 400px;
+    height: 74px;
+    font-size: 2rem;
+  }
+}
+
+@media (min-width: 3400px) {
+  .nav {
+    width: min(100%, 2450px);
+    min-height: 132px;
+  }
+
+  .logoImg {
+    width: 104px;
+    height: 104px;
+  }
+
+  .logo {
+    min-width: 510px;
+    height: 92px;
+    font-size: 2.45rem;
+  }
+}
+
+/* Tablets and down: keep only logo + hamburger, stable layout */
+@media (max-width: 1024px) {
+  .nav {
+    justify-content: space-between;
     width: 100%;
     max-width: 100vw;
-    padding: 0.75rem 1rem;      /* slimmer so header isn’t tall */
-    overflow-x: clip;           /* no horizontal scroll from header */
   }
 
-  /* Logo sits in flow on tablets (override absolute from desktop) */
-  .logoContainer { position: static !important; }
+  .logoContainer {
+    position: static;
+    transform: none;
+  }
 
-  /* Slightly smaller logo so it doesn’t crowd the hamburger */
-  .logoImg { width: 56px; height: 56px; }
+  .logoDropdown {
+    display: none;
+  }
 
-  /* Ensure hamburger is visible and doesn’t shrink away */
-  .hamburger { display: block !important; margin-left: auto; flex-shrink: 0; }
+  .hamburger {
+    display: inline-flex;
+  }
 
-  /* Pill stays hidden on tablets (double down just in case) */
-  .logoDropdown { display: none !important; }
+  .mobileMenu {
+    display: block;
+  }
 }
 
-/* Extra safety: never let the header create horizontal scroll on any ≤1024px */
-@media (max-width: 1024px) {
-  .header { overflow-x: clip; }
-}
-/* phones (≤480px) */
-@media (max-width: 480px) {
-  .hamburgerIcon { width: 24px; height: 24px; }
+@media (max-width: 640px) {
+  .nav {
+    min-height: 66px;
+    padding: 0.55rem 0.8rem;
+  }
+
+  .logoImg {
+    width: 48px;
+    height: 48px;
+  }
+
+  .mobileMenu {
+    left: 0.7rem;
+    right: 0.7rem;
+    border-radius: 18px;
+  }
 }
 
-/* regular phones */
-@media (min-width: 481px) and (max-width: 767px) {
-  .hamburgerIcon { width: 28px; height: 28px; }
+@media (max-width: 380px) {
+  .logoImg {
+    width: 42px;
+    height: 42px;
+  }
+
+  .hamburger {
+    width: 40px;
+    height: 40px;
+    border-radius: 14px;
+  }
+
+  .hamburgerIcon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .mobileMenu li a {
+    padding: 0.82rem 0.85rem;
+  }
 }
 
-/* tablets */
-@media (min-width: 768px) and (max-width: 1024px) {
-  .hamburgerIcon { width: 32px; height: 32px; }
+@media (prefers-reduced-motion: reduce) {
+  .dropdownContent,
+  .mobileMenu li a {
+    transition: none !important;
+  }
 }
 
-/* small laptops */
-@media (min-width: 1025px) and (max-width: 1440px) {
-  .hamburgerIcon { width: 36px; height: 36px; }
-}
 
-/* large desktops */
-@media (min-width: 1441px) {
-  .hamburgerIcon { width: 40px; height: 40px; }
-}
+/* ===== Dropdown hover reliability fix ===== */
+@media (min-width: 1025px) {
+  .logoDropdown {
+    z-index: 300;
+  }
 
+  .logoDropdown::after {
+    content: "";
+    position: absolute;
+    left: -1.5rem;
+    right: -1.5rem;
+    top: 100%;
+    height: 1.4rem;
+    background: transparent;
+    pointer-events: auto;
+  }
+
+  .dropdownContent {
+    top: calc(100% + 0.22rem);
+    z-index: 350;
+  }
+
+  .logoDropdown:hover .dropdownContent,
+  .logoDropdown:focus-within .dropdownContent,
+  .dropdownContent:hover {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+  }
+}

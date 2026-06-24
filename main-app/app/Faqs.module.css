@@ -89,3 +89,159 @@
   /* allows expansion */
   opacity: 1;
 }
+
+/* ===== RESPONSIVE PASS V2 ===== */
+.faqsSection { padding: clamp(3.5rem, 6vw, 5.5rem) clamp(1rem, 3vw, 2rem); }
+.faqsContainerInner { width: min(100%, 1000px); gap: clamp(1rem, 2vw, 1.5rem); }
+.faqsTitle { font-size: clamp(2rem, 4.5vw, 3rem); margin-bottom: clamp(2rem, 5vw, 3rem); letter-spacing: -0.045em; text-wrap: balance; }
+.faqsContainer { gap: clamp(0.85rem, 1.7vw, 1.5rem); }
+.faqItem { border-radius: clamp(14px, 2vw, 20px); padding: clamp(1rem, 2vw, 1.35rem) clamp(1rem, 2.4vw, 1.6rem); background: rgba(255, 255, 255, 0.78); backdrop-filter: blur(12px); }
+.faqQuestion { gap: 1rem; font-weight: 900; line-height: 1.35; overflow-wrap: anywhere; }
+.icon { flex: 0 0 auto; font-size: clamp(1.2rem, 2vw, 1.5rem); margin-right: 0; }
+.faqAnswer { font-size: clamp(0.92rem, 1.2vw, 1rem); line-height: 1.65; }
+.active .faqAnswer { max-height: 460px; }
+
+@media (min-width: 1441px) { .faqsContainerInner { width: min(100%, 1120px); } }
+@media (min-width: 1921px) { .faqsContainerInner { width: min(100%, 1320px); } }
+@media (max-width: 620px) { .faqsSection { padding: 3.2rem 0.9rem; } .faqsTitle { font-size: clamp(1.8rem, 9vw, 2.35rem); } .faqQuestion { align-items: flex-start; } .faqItem { padding: 1rem; } }
+@media (max-width: 360px) { .faqsSection { padding-inline: 0.75rem; } .faqQuestion { font-size: 0.94rem; } .faqAnswer { font-size: 0.88rem; } }
+@media (hover: none) { .faqItem:hover { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .faqItem, .icon, .faqAnswer { transition: none !important; } }
+
+
+/* ===== V3: stronger 4K / ultrawide scaling ===== */
+@media (min-width: 1921px) {
+  .faqsSection {
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+    padding-block: 8rem;
+  }
+
+  .faqsContainerInner {
+    width: min(100%, 1500px);
+  }
+
+  .faqsTitle {
+    font-size: clamp(5rem, 3.4vw, 7rem);
+  }
+
+  .faqItem {
+    padding: 2rem 2.3rem;
+    border-radius: 28px;
+  }
+
+  .faqQuestion {
+    font-size: 1.4rem;
+  }
+
+  .faqAnswer {
+    font-size: 1.2rem;
+  }
+}
+
+@media (min-width: 3400px) {
+  .faqsContainerInner {
+    width: min(100%, 2100px);
+  }
+
+  .faqsTitle {
+    font-size: clamp(7rem, 3.1vw, 9.5rem);
+  }
+
+  .faqQuestion {
+    font-size: 1.9rem;
+  }
+
+  .faqAnswer {
+    font-size: 1.55rem;
+  }
+}
+/* ===== FULL PAGE DISCOVERY CTA ===== */
+
+.moreQuestionsContainer {
+  margin-top: 3.5rem;
+  text-align: center;
+  padding: 2.5rem 2rem;
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px dashed rgba(255, 47, 139, 0.2);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.teaserBadge {
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #ff2f8e; /* Vibrant brand pink accent */
+  background: rgba(255, 47, 139, 0.06);
+  padding: 6px 14px;
+  border-radius: 100px;
+}
+
+.teaserText {
+  font-size: clamp(1.05rem, 2vw, 1.25rem);
+  font-weight: 800;
+  color: #11141a;
+  max-width: 580px;
+  line-height: 1.4;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.015em;
+}
+
+.fullPageLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: #ffffff;
+  color: #11141a;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 800;
+  padding: 14px 28px;
+  border-radius: 100px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 25px rgba(16, 24, 40, 0.06);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), 
+              box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.arrowIcon {
+  font-size: 1.1rem;
+  color: #ff2f8e;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Hover & Interactive States */
+.fullPageLink:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 47, 139, 0.25);
+  box-shadow: 0 16px 32px rgba(255, 47, 139, 0.08), 0 4px 8px rgba(0, 0, 0, 0.01);
+}
+
+.fullPageLink:hover .arrowIcon {
+  transform: translateX(5px);
+}
+
+.fullPageLink:active {
+  transform: translateY(-1px);
+}
+
+/* Responsive adjustment for small viewports */
+@media (max-width: 480px) {
+  .moreQuestionsContainer {
+    padding: 2rem 1.25rem;
+    margin-top: 2.5rem;
+  }
+  .fullPageLink {
+    width: 100%;
+    justify-content: center;
+    padding-inline: 1.5rem;
+  }
+}

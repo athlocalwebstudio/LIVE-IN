@@ -10,43 +10,49 @@ const montserrat = Montserrat({
   weight: ["400", "600", "700", "800"],
 });
 
+// app/layout.js
+
 export const metadata = {
-  title: "Live In",
-  description: "Make money fast with TikTok Live games",
-  authors: [{ name: "Live In" }],
+  metadataBase: new URL("https://playlivetiktok.com"), // Change to your live domain
+  title: {
+    default: "TikTok LIVE Games | Interactive Games for TikTok Streamers",
+    template: "%s | Live In"
+  },
+  description:
+    "Boost engagement, gifts, and watch time with interactive TikTok LIVE games. Racing, battles, spacecraft games, and more.",
   keywords: [
-    "TikTok",
-    "Live games",
-    "make money",
-    "gaming",
-    "Live In",
-    "easy money",
-    "Live Streaming",
-    "TikTok Live",
-    "TikTok Games",
+    "TikTok LIVE games",
+    "interactive TikTok games",
+    "TikTok LIVE engagement",
+    "TikTok gift games",
+    "TikTok streamer tools",
+    "TikTok LIVE battles"
   ],
   icons: {
     icon: "/logo.png",
   },
+  alternates: {
+    canonical: "/", // Tells Google this is the absolute authority link
+  },
   openGraph: {
     type: "website",
-    url: "https://yourdomain.com",
-    title: "Live In - TikTok Live Games",
-    description: "Get TikTok Live games that help you make money fast.",
+    url: "https://playlivetiktok.com",
+    title: "Live In - Interactive TikTok Live Games",
+    description: "Boost engagement, gifts, and watch time with interactive TikTok LIVE games. Racing, battles, and more.", // Aligned description
     images: [
       {
-        url: "https://yourdomain.com/og-image.jpg",
-        width: 800,
-        height: 600,
-        alt: "Live In TikTok Live Games",
+        url: "/og-image.jpg", // Kept relative to metadataBase
+        width: 1200,
+        height: 630,
+        alt: "Live In TikTok Live Games Dashboard",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Live In - TikTok Live Games",
-    description: "Get TikTok Live games that help you make money fast.",
-    images: ["https://yourdomain.com/twitter-image.jpg"],
+    description: "Boost engagement, gifts, and watch time with interactive TikTok LIVE games.",
+    images: ["/twitter-image.jpg"],
   },
 };
 
