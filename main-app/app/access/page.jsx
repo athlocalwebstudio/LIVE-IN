@@ -20,34 +20,12 @@ export default function AccessPage() {
     }
   }, [keyFromUrl]);
 
-  const isButtonDisabled = useMemo(() => {
-    return loading || !licenseKey.trim();
-  }, [loading, licenseKey]);
+  // FORCE BUTTON TO STAY DISABLED DURING MAINTENANCE
+  const isButtonDisabled = true; 
 
   async function handleSubmit(e) {
     e.preventDefault();
-    setLoading(true);
-    setResult(null);
-
-    try {
-      const response = await fetch("/api/validate-license", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ licenseKey }),
-      });
-
-      const data = await response.json();
-      setResult(data);
-    } catch (error) {
-      setResult({
-        valid: false,
-        message: "Something went wrong. Please try again.",
-      });
-    } finally {
-      setLoading(false);
-    }
+    // Disabled during maintenance framework adjustments
   }
 
   return (
@@ -58,15 +36,18 @@ export default function AccessPage() {
 
       <div className={styles.container}>
         <section className={styles.heroBlock}>
-          <span className={styles.sectionLabel}>🔐 Secure License Access</span>
-          <h1 className={styles.title}>Unlock your Live In games in seconds</h1>
+          {/* UPDATED PILL TO SHOW MAINTENANCE JUST LIKE PRICING */}
+          <span className={styles.sectionLabel} style={{ borderColor: '#ef4444', color: '#ef4444' }}>
+            ⚠️ System Optimization Phase 1.4 Active
+          </span>
+          <h1 className={styles.title}>Unlock your Live In games</h1>
           <p className={styles.text}>
-            Enter the license key you received after checkout to access your downloads,
-            updates, and setup resources.
+            Our internal global key infrastructure is undergoing scheduled framework adjustments. 
+            Validation gates are currently isolated.
           </p>
 
           <div className={styles.heroChips}>
-            <span className={styles.chip}>Instant verification</span>
+            <span className={styles.chip} style={{ color: '#ef4444' }}>Key verification offline</span>
             <span className={styles.chip}>Protected access</span>
             <span className={styles.chip}>Fast game download</span>
           </div>
@@ -75,18 +56,32 @@ export default function AccessPage() {
         <section className={styles.mainCard}>
           <div className={styles.formColumn}>
             <div className={styles.cardHeader}>
-              <div className={styles.iconWrap}>⚡</div>
+              <div className={styles.iconWrap} style={{ background: 'linear-gradient(135deg, #ef4444, #f43f5e)' }}>⚙️</div>
               <div>
-                <h2 className={styles.cardTitle}>Verify your license key</h2>
+                <h2 className={styles.cardTitle}>License Portal Under Maintenance</h2>
                 <p className={styles.cardText}>
-                  Paste your key below. If it&apos;s valid, your download will unlock instantly.
+                  We are stabilizing our server nodes. Registration links will reconnect shortly.
                 </p>
+              </div>
+            </div>
+
+            {/* HIGH VISIBILITY MAINTENANCE BOX REUSING EXISTING ERRORBOX STYLES */}
+            <div className={styles.errorBox} style={{ marginBottom: '1.5rem', marginTop: '0' }}>
+              <div className={styles.resultHeader}>
+                <span className={styles.resultIconError}>ℹ️</span>
+                <div>
+                  <h3 className={styles.resultTitle} style={{ color: '#b91c1c' }}>Are you an Itch.io Buyer?</h3>
+                  <p className={styles.resultMessage} style={{ fontSize: '0.95rem', color: '#7f1d1d' }}>
+                    If you purchased individual titles or bundles on <strong>itch.io</strong>, you do not need an activation key here! 
+                    Simply log into your itch.io account to download your files and game bundles directly.
+                  </p>
+                </div>
               </div>
             </div>
 
             <form onSubmit={handleSubmit} className={styles.form}>
               <label className={styles.inputLabel} htmlFor="license-key">
-                License key
+                License key (Temporarily Locked)
               </label>
 
               <div className={styles.inputRow}>
@@ -96,59 +91,25 @@ export default function AccessPage() {
                   type="text"
                   value={licenseKey}
                   onChange={(e) => setLicenseKey(e.target.value)}
-                  placeholder="Enter your license key"
+                  placeholder="Verification offline during system work..."
                   autoComplete="off"
-                  required
+                  disabled={true} // Locks input box during server work
+                  style={{ backgroundColor: 'rgba(0,0,0,0.03)', cursor: 'not-allowed' }}
                 />
 
-                <button className={styles.button} disabled={isButtonDisabled}>
-                  {loading ? "Checking..." : "Unlock Games"}
+                <button 
+                  className={styles.button} 
+                  disabled={isButtonDisabled}
+                  style={{ background: 'linear-gradient(90deg, #4b5563, #374151)', boxShadow: 'none' }}
+                >
+                  Locked
                 </button>
               </div>
 
               <p className={styles.helperText}>
-                Tip: you can copy the key directly from your purchase email and paste it here.
+                Need immediate manual deployment? Please jump into our Discord node below for support.
               </p>
             </form>
-
-            {result && (
-              <div className={result.valid ? styles.successBox : styles.errorBox}>
-                <div className={styles.resultHeader}>
-                  <span className={result.valid ? styles.resultIconSuccess : styles.resultIconError}>
-                    {result.valid ? "✓" : "!"}
-                  </span>
-                  <div>
-                    <h3 className={styles.resultTitle}>
-                      {result.valid ? "License verified" : "License not accepted"}
-                    </h3>
-                    <p className={styles.resultMessage}>{result.message}</p>
-                  </div>
-                </div>
-
-                {result.valid && (
-                  <div className={styles.downloads}>
-                    <div className={styles.downloadCard}>
-                      <div>
-                        <p className={styles.downloadEyebrow}>Main download</p>
-                        <h4>Live In Games Pack</h4>
-                        <p className={styles.smallText}>
-                          Your access is active. Use the button below to download your files.
-                        </p>
-                      </div>
-
-                      <a className={styles.downloadButton} href="/api/download/live-in-pack">
-                        Download Pack
-                      </a>
-                    </div>
-
-                    <p className={styles.warningText}>
-                      Keep your key private. For production, connect this to protected storage and
-                      never place your game ZIP in the public folder.
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
           </div>
 
           <aside className={styles.sideColumn}>
@@ -158,38 +119,29 @@ export default function AccessPage() {
                 <div className={styles.stepItem}>
                   <span>01</span>
                   <div>
-                    <strong>Copy your key</strong>
-                    <p>Get it from your Lemon Squeezy receipt email after purchase.</p>
+                    <strong>System Core Update</strong>
+                    <p>Database synchronization is routing accounts to the custom target domain layout.</p>
                   </div>
                 </div>
 
                 <div className={styles.stepItem}>
                   <span>02</span>
                   <div>
-                    <strong>Paste and verify</strong>
-                    <p>We securely check whether your license is active and valid.</p>
-                  </div>
-                </div>
-
-                <div className={styles.stepItem}>
-                  <span>03</span>
-                  <div>
-                    <strong>Download and start</strong>
-                    <p>Unlock your games and begin setting up your LIVE instantly.</p>
+                    <strong>Safe Handshakes</strong>
+                    <p>Validation processes are being hardened against API interruptions.</p>
                   </div>
                 </div>
               </div>
             </div>
 
             <div className={styles.infoCardSecondary}>
-              <span className={styles.supportBadge}>Need help?</span>
+              <span className={styles.supportBadge}>Direct Node Help</span>
               <h3>Join our Discord support</h3>
               <p>
-                If your key is not working or you need help setting things up, contact us and we&apos;ll
-                help you out.
+                If you have an active key or receipt and need manual file generation immediately, click below to open a ticket.
               </p>
               <a href={discordUrl} target="_blank" rel="noreferrer" className={styles.secondaryButton}>
-                Open Discord
+                Open Discord Support Ticket
               </a>
             </div>
           </aside>

@@ -53,23 +53,25 @@ export default function LandingPage() {
 
           <motion.div className={styles.actions} variants={fadeUp}>
             <motion.a
-              href="#pricing"
+              href="#games"
               className={styles.primaryButton}
               whileHover={{ y: -4, scale: 1.025 }}
               whileTap={{ scale: 0.96 }}
             >
-              View Pricing
+              Buy Now
               <span aria-hidden="true">→</span>
             </motion.a>
 
             <motion.a
-              href="/access"
+              href="https://discord.gg/XhyeJnpMR" // Replace with your real invite link
+              target="_blank"
+              rel="noopener noreferrer"
               className={styles.secondaryButton}
               whileHover={{ y: -4, scale: 1.025 }}
               whileTap={{ scale: 0.96 }}
             >
-              Already bought? Access games
-            </motion.a>
+              Need Setup Help? Join Discord
+           </motion.a>
           </motion.div>
         </motion.div>
 

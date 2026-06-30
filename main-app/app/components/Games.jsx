@@ -5,6 +5,7 @@ import styles from "@/app/games.module.css";
 import { motion, useAnimation } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 
+// 1. ADDED THE 'url' FIELD TO EACH GAME OBJECT
 const games = [
   {
     image: "/SquidGame.png",
@@ -12,6 +13,7 @@ const games = [
     category: "Reaction game",
     description:
       "A fast viewer-controlled challenge that keeps people watching, reacting, and waiting for the next round.",
+    url: "https://iliaskot.itch.io/tiktok-live-games", 
   },
   {
     image: "/football_modern.png",
@@ -19,6 +21,7 @@ const games = [
     category: "Team battle",
     description:
       "Viewers choose sides, push their team forward, and turn every goal attempt into a LIVE moment.",
+    url: "https://iliaskot.itch.io/tiktok-live-game-score-goal",
   },
   {
     image: "/tiktok_live_games_bundle.png",
@@ -27,6 +30,7 @@ const games = [
     imageMode: "contain",
     description:
       "Get access to all 5 TikTok LIVE games in one bundle and let your audience interact through likes, comments, and gifts.",
+    url: "https://iliaskot.itch.io/tiktoklivegames",
   },
   {
     image: "/Ping Pong.png",
@@ -35,6 +39,7 @@ const games = [
     imageMode: "contain",
     description:
       "Red versus Blue chaos where viewers join teams and fight live through TikTok interactions.",
+    url: "https://iliaskot.itch.io/new-tiktok-live-game",
   },
   {
     image: "/space_modern.png",
@@ -42,6 +47,7 @@ const games = [
     category: "Gift Race",
     description:
       "Viewers move the spacecrafts by sending gifts, but you can also control them manually.",
+    url: "https://iliaskot.itch.io/tiktok-live-interactive-game-spacecrafts-race",
   },
   {
     image: "/driverush.png",
@@ -49,14 +55,15 @@ const games = [
     category: "Car Racing",
     description:
       "DriveRush turns your TikTok LIVE into an interactive racing game where viewers control the action.",
+    url: "https://iliaskot.itch.io/tiktok-live-game-driverush",
   },
-
   {
     title: "Mystery Game",
     category: "Secret drop",
     isMystery: true,
     description:
       "A hidden interactive game is included in the bundle. Buy access and discover it inside the library.",
+    url: "#pricing", // Keeps the mystery card scrolling down to your section
   },
 ];
 
@@ -187,7 +194,13 @@ const Games = () => {
                   variants={itemVariants}
                   whileTap={{ scale: 0.97 }}
                 >
-                  <a className={styles.cardLink} href="#pricing">
+                  {/* 2. DYNAMICALLY UPDATED LINK AND TARGET ENTRIES HERE */}
+                  <a 
+                    className={styles.cardLink} 
+                    href={game.url}
+                    target={game.url.startsWith("http") ? "_blank" : undefined}
+                    rel={game.url.startsWith("http") ? "noopener noreferrer" : undefined}
+                  >
                     <div className={styles.cardTopRow}>
                       <span className={styles.cardNumber}>
                         {String(index + 1).padStart(2, "0")}
@@ -230,9 +243,12 @@ const Games = () => {
                     </div>
 
                     <div className={styles.cardFooter}>
-                      <span>{game.isMystery ? "Hidden bonus" : "Included"}</span>
-                      <strong>{game.isMystery ? "Reveal now →" : "View pricing →"}</strong>
-                    </div>
+                     {/* CHANGED "Included" TO "Official Store" FOR CLARITY */}
+                      <span>{game.isMystery ? "Hidden bonus" : "Official Store"}</span>
+  
+                      {/* CHANGED "View on itch.io" TO "Buy on itch.io" TO INSTANTLY SIGNAL A TRANSACTION */}
+                      <strong>{game.isMystery ? "Reveal now →" : "Buy on itch.io →"}</strong>
+</div>
                   </a>
                 </motion.article>
               ))}
