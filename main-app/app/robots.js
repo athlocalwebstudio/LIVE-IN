@@ -4,8 +4,9 @@ export default function robots() {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/api/"], // Prevents engines from scanning secure calculation backends
+      disallow: "/api/", // Stops bots from scanning backend code
     },
-    sitemap: "https://playtiktoklive.com/sitemap.xml",
+    // FIXED: Corrected domain spelling so Google can actually find your map!
+    sitemap: "https://playlivetiktok.com/sitemap.xml",
   };
 }
