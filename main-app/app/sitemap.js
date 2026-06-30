@@ -28,6 +28,13 @@ export default async function sitemap() {
       changeFrequency: "yearly",
       priority: 0.3,
     },
+    // Add this entry block right inside your app/sitemap.js array return:
+    {
+      url: `${baseUrl}/setup-guide`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.9, // Ranked high because this guides high-intent organic searchers
+    },
     {
       url: `${baseUrl}/Disclaimer`,
       lastModified: new Date(),

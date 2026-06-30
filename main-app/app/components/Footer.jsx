@@ -69,6 +69,7 @@ const Footer = () => {
               <li><a href="/#pricing">Pricing</a></li>
               <li><a href="/access">Access Games</a></li>
               <li><a href="/faq">FAQ</a></li>
+              <li><a href="/setup-guide">Setup Guide</a></li> 
             </ul>
           </div>
 
