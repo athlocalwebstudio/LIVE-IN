@@ -39,6 +39,7 @@ const Header = () => {
             <li><Link href="/#pricing">Pricing</Link></li>
             <li><Link href="/access">Access Games</Link></li>
             <li><Link href="/faq">FAQS</Link></li>
+            <li><Link href="/setup-guide">Setup Guide</Link></li>
             <li><Link href="https://youtube.com/@iliaskot" target="_blank">YouTube</Link></li>
             <li><Link href={discordUrl} target="_blank">Discord</Link></li>
             <li><Link href="https://www.tiktok.com/@live_in_official" target="_blank">TikTok</Link></li>
