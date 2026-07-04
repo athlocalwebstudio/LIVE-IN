@@ -63,7 +63,7 @@ export default function LandingPage() {
             </motion.a>
 
             <motion.a
-              href="https://discord.gg/XhyeJnpMR" // Replace with your real invite link
+              href="https://discord.gg/XEvDZrtpX" // Replace with your real invite link
               target="_blank"
               rel="noopener noreferrer"
               className={styles.secondaryButton}
