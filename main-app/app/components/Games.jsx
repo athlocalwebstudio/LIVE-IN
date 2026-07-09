@@ -16,12 +16,12 @@ const games = [
     url: "https://iliaskot.itch.io/tiktok-live-games", 
   },
   {
-    image: "/football_modern.png",
-    title: "Score Goal",
-    category: "Team battle",
+    image: "/score_goal.png",
+    title: "World-Cup",
+    category: "Team Battle",
     description:
-      "Viewers choose sides, push their team forward, and turn every goal attempt into a LIVE moment.",
-    url: "https://iliaskot.itch.io/tiktok-live-game-score-goal",
+      "Turn Your TikTok LIVE Into an Interactive FIFA World Cup Experience ⚽",
+    url: "https://iliaskot.itch.io/worldcup-tiktok-live-game",
   },
   {
     image: "/tiktok_live_games_bundle.png",
@@ -32,7 +32,7 @@ const games = [
       "Get access to all 5 TikTok LIVE games in one bundle and let your audience interact through likes, comments, and gifts.",
     url: "https://iliaskot.itch.io/tiktoklivegames",
   },
-  {
+    {
     image: "/Ping Pong.png",
     title: "Shooting Battle",
     category: "PvP arena",
@@ -40,14 +40,6 @@ const games = [
     description:
       "Red versus Blue chaos where viewers join teams and fight live through TikTok interactions.",
     url: "https://iliaskot.itch.io/new-tiktok-live-game",
-  },
-  {
-    image: "/space_modern.png",
-    title: "Spacecrafts Race",
-    category: "Gift Race",
-    description:
-      "Viewers move the spacecrafts by sending gifts, but you can also control them manually.",
-    url: "https://iliaskot.itch.io/tiktok-live-interactive-game-spacecrafts-race",
   },
   {
     image: "/driverush.png",
@@ -58,6 +50,22 @@ const games = [
     url: "https://iliaskot.itch.io/tiktok-live-game-driverush",
   },
   {
+    image: "/football_modern.png",
+    title: "Score Goal",
+    category: "Team battle",
+    description:
+      "Viewers choose sides, push their team forward, and turn every goal attempt into a LIVE moment.",
+    url: "https://iliaskot.itch.io/tiktok-live-game-score-goal",
+  },
+  {
+    image: "/space_modern.png",
+    title: "Spacecrafts Race",
+    category: "Gift Race",
+    description:
+      "Viewers move the spacecrafts by sending gifts, but you can also control them manually.",
+    url: "https://iliaskot.itch.io/tiktok-live-interactive-game-spacecrafts-race",
+  },
+  {
     title: "Mystery Game",
     category: "Secret drop",
     isMystery: true,
@@ -65,6 +73,7 @@ const games = [
       "A hidden interactive game is included in the bundle. Buy access and discover it inside the library.",
     url: "#pricing", // Keeps the mystery card scrolling down to your section
   },
+  
 ];
 
 const sectionVariants = {
