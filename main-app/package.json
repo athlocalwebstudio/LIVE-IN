@@ -3,12 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "postbuild": "next-sitemap",
-    "start": "next start",
-    "lint": "next lint"
-  },
+  "dev": "next dev",
+  "build": "next build",
+  "postbuild": "next-sitemap",
+  "postinstall": "prisma generate",
+  "start": "next start",
+  "lint": "next lint"
+},
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "@prisma/adapter-pg": "^7.9.1",
