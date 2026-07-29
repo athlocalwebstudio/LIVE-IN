@@ -11,9 +11,13 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
+    "@prisma/adapter-pg": "^7.9.1",
+    "@prisma/client": "^7.9.1",
     "framer-motion": "^12.23.12",
     "next": "^16.1.6",
     "next-sitemap": "^4.2.3",
+    "pg": "^8.22.0",
+    "prisma": "^7.9.1",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-icons": "^5.5.0",

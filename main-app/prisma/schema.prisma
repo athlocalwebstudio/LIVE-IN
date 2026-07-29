@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String            @id @default(cuid())
+  itchUserId   String            @unique
+  itchUsername String?
+  createdAt    DateTime          @default(now())
+  email        String?           @unique
+  entitlements Entitlement[]
+  sessions     LauncherSession[]
+  purchases    Purchase[]
+}
+
+model LauncherSession {
+  id          String   @id @default(cuid())
+  userId      String
+  sessionHash String   @unique
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model Game {
+  id           String        @id @default(cuid())
+  slug         String        @unique
+  title        String
+  itchGameId   String        @unique
+  purchaseUrl  String
+  entitlements Entitlement[]
+  releases     GameRelease[]
+  purchases    Purchase[]
+}
+
+model GameRelease {
+  id        String  @id @default(cuid())
+  gameId    String
+  version   String
+  fileName  String
+  sha256    String
+  sizeBytes Int
+  objectKey String
+  published Boolean @default(false)
+  game      Game    @relation(fields: [gameId], references: [id])
+}
+
+model Entitlement {
+  id         String    @id @default(cuid())
+  userId     String
+  gameId     String
+  source     String
+  verifiedAt DateTime  @default(now())
+  expiresAt  DateTime?
+  lifetime   Boolean   @default(false)
+  game       Game      @relation(fields: [gameId], references: [id])
+  user       User      @relation(fields: [userId], references: [id])
+
+  @@unique([userId, gameId])
+}
+
+model LauncherLoginRequest {
+  id                 String    @id @default(cuid())
+  installationIdHash String
+  stateHash          String
+  pollingSecretHash  String
+  sessionToken       String?
+  expiresAt          DateTime
+  completedAt        DateTime?
+  createdAt          DateTime  @default(now())
+}
+
+model Purchase {
+  id         String   @id @default(cuid())
+  userId     String
+  gameId     String
+  provider   String
+  externalId String   @unique
+  status     String
+  createdAt  DateTime @default(now())
+  game       Game     @relation(fields: [gameId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
+}
