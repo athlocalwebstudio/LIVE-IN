@@ -90,6 +90,8 @@ const Footer = () => {
               <li><a href="/Disclaimer">Disclaimer</a></li>
               <li><a href={`mailto:${supportEmail}`}>Refund Questions</a></li>
               <li><a href="/Privacy-Policy">Privacy Policy</a></li>
+              <li><a href="/Refund-Policy">Refund Policy</a></li>
+              
             </ul>
           </div>
         </div>
