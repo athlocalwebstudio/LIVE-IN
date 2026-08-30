@@ -1,25 +1,16 @@
-
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
-export default async function LauncherSuccessPage({ searchParams }) {
+export default async function LauncherSuccessPage() {
   const supabase = await createClient();
 
-  const params = await searchParams;
-  const code = params?.code;
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (!code) {
-    redirect("/launcher/error?reason=missing_code");
-  }
-
-  const { error } = await supabase.auth.exchangeCodeForSession(code);
-
-  if (error) {
-    console.error("SUPABASE CALLBACK ERROR:", error);
-
+  if (!user) {
     redirect("/launcher/error?reason=invalid_code");
   }
 
   redirect("/launcher/sign-in?verified=true");
 }
-
