@@ -1,12 +1,16 @@
-
 import { NextResponse } from "next/server";
-import { authenticateLauncherRequest } from "@/lib/launcher-auth";
+import { createClient } from "@/lib/supabase/server";
 
-export async function GET(request) {
+export async function GET() {
   try {
-    const auth = await authenticateLauncherRequest(request);
+    const supabase = await createClient();
 
-    if (!auth) {
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
@@ -18,10 +22,7 @@ export async function GET(request) {
       games: [],
     });
   } catch (error) {
-    console.error(
-      "GET /api/v1/me/library ERROR:",
-      error
-    );
+    console.error("LIBRARY API ERROR:", error);
 
     return NextResponse.json(
       { error: "Internal server error" },
@@ -29,4 +30,3 @@ export async function GET(request) {
     );
   }
 }
-

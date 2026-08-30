@@ -1,44 +1,46 @@
-
 import { NextResponse } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { authenticateLauncherRequest } from "@/lib/launcher-auth";
+import { createClient } from "@/lib/supabase/server";
 
-export async function GET(request) {
+export async function GET() {
   try {
-    const auth = await authenticateLauncherRequest(request);
+    const supabase = await createClient();
 
-    if (!auth) {
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
       );
     }
 
-    const supabase = createAdminClient();
+    const { data: profile, error: profileError } =
+      await supabase
+        .from("profiles")
+        .select("id, display_name")
+        .eq("id", user.id)
+        .single();
 
-    const { data: userData, error: userError } =
-      await supabase.auth.admin.getUserById(auth.userId);
+    if (profileError || !profile) {
+      console.error("PROFILE FETCH ERROR:", profileError);
 
-    if (userError || !userData?.user) {
       return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
+        { error: "Profile not found" },
+        { status: 404 }
       );
     }
-
-    const user = userData.user;
-
-    const displayName =
-      user.user_metadata?.display_name || "";
 
     return NextResponse.json({
       id: user.id,
       email: user.email,
-      displayName,
+      displayName: profile.display_name,
       emailVerified: Boolean(user.email_confirmed_at),
     });
   } catch (error) {
-    console.error("GET /api/v1/me ERROR:", error);
+    console.error("ME API ERROR:", error);
 
     return NextResponse.json(
       { error: "Internal server error" },
@@ -46,4 +48,3 @@ export async function GET(request) {
     );
   }
 }
-
