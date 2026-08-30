@@ -101,52 +101,61 @@ export default function SignInPage() {
     }
   }
 
-  async function handleResendVerification() {
-    if (resending) return;
+ async function handleResendVerification() {
+  if (resending) return;
 
-    setError("");
-    setMessage("");
+  setError("");
+  setMessage("");
 
-    if (!form.email.trim()) {
-      setError("Enter your email address first.");
+  const normalizedEmail = form.email.trim().toLowerCase();
+
+  if (!normalizedEmail) {
+    setError("Enter your email address first.");
+    return;
+  }
+
+  try {
+    setResending(true);
+
+    const { error: resendError } =
+      await supabase.auth.resend({
+        type: "signup",
+        email: normalizedEmail,
+        options: {
+          emailRedirectTo:
+            `${window.location.origin}/launcher/success`,
+        },
+      });
+
+    if (resendError) {
+      console.error(
+        "SUPABASE RESEND ERROR:",
+        resendError
+      );
+
+      setError(
+        "We couldn't resend the verification email. Please try again later."
+      );
+
       return;
     }
 
-    try {
-      setResending(true);
+    setMessage(
+      "If your account is eligible for verification, a new email has been sent. Please check your inbox and spam folder."
+    );
+  } catch (err) {
+    console.error(
+      "RESEND VERIFICATION ERROR:",
+      err
+    );
 
-      const { error: resendError } =
-        await supabase.auth.resend({
-          type: "signup",
-          email: form.email.trim(),
-          options: {
-            emailRedirectTo: `${window.location.origin}/launcher/success`,
-          },
-        });
-
-      if (resendError) {
-        console.error(
-          "SUPABASE RESEND ERROR:",
-          resendError
-        );
-
-        setError(
-          "We couldn't resend the verification email. Please try again later."
-        );
-        return;
-      }
-
-      setMessage(
-        "A new verification email has been sent. Please check your inbox."
-      );
-    } catch (err) {
-      console.error("RESEND VERIFICATION ERROR:", err);
-
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setResending(false);
-    }
+    setError(
+      "Something went wrong. Please try again later."
+    );
+  } finally {
+    setResending(false);
   }
+}
 
   return (
     <main className={styles.page}>
