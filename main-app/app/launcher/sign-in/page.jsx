@@ -128,17 +128,14 @@ export default function SignInPage() {
       });
 
     if (resendError) {
-      console.error(
-        "SUPABASE RESEND ERROR:",
-        resendError
-      );
+  console.error("SUPABASE RESEND ERROR:", resendError);
 
-      setError(
-        "We couldn't resend the verification email. Please try again later."
-      );
+  setError(
+    `${resendError.message} (${resendError.code || resendError.status || "unknown"})`
+  );
 
-      return;
-    }
+  return;
+}
 
     setMessage(
       "If your account is eligible for verification, a new email has been sent. Please check your inbox and spam folder."
