@@ -1,16 +1,94 @@
-import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
 
-export async function GET() {
+import { NextResponse } from "next/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import crypto from "crypto";
+
+function hashToken(token) {
+  return crypto
+    .createHash("sha256")
+    .update(token)
+    .digest("hex");
+}
+
+export async function GET(request) {
   try {
-    const supabase = await createClient();
+    const authorizationHeader =
+      request.headers.get("authorization");
+
+    if (
+      typeof authorizationHeader !== "string" ||
+      !authorizationHeader.startsWith("Bearer ")
+    ) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    const accessToken =
+      authorizationHeader.slice("Bearer ".length).trim();
+
+    if (!accessToken) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    const accessTokenHash =
+      hashToken(accessToken);
+
+    const supabase = createAdminClient();
 
     const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
+      data: session,
+      error: sessionError,
+    } = await supabase
+      .from("launcher_sessions")
+      .select(
+        `
+          id,
+          user_id,
+          expires_at,
+          revoked_at
+        `
+      )
+      .eq(
+        "access_token_hash",
+        accessTokenHash
+      )
+      .maybeSingle();
 
-    if (userError || !user) {
+    if (sessionError) {
+      console.error(
+        "LIBRARY SESSION LOOKUP ERROR:",
+        sessionError
+      );
+
+      return NextResponse.json(
+        { error: "Internal server error" },
+        { status: 500 }
+      );
+    }
+
+    if (!session) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    if (session.revoked_at) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    if (
+      new Date(session.expires_at).getTime() <=
+      Date.now()
+    ) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
@@ -22,7 +100,10 @@ export async function GET() {
       games: [],
     });
   } catch (error) {
-    console.error("LIBRARY API ERROR:", error);
+    console.error(
+      "LIBRARY API ERROR:",
+      error
+    );
 
     return NextResponse.json(
       { error: "Internal server error" },
@@ -30,3 +111,4 @@ export async function GET() {
     );
   }
 }
+

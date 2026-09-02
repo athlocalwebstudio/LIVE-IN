@@ -1,35 +1,119 @@
+
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 
 import styles from "./authorize.module.css";
 
+const LAUNCHER_CLIENT_ID = "playlive-launcher";
+const LAUNCHER_RESPONSE_TYPE = "code";
+
+function isValidLoopbackRedirect(redirectUri) {
+  try {
+    const url = new URL(redirectUri);
+
+    if (url.protocol !== "http:") {
+      return false;
+    }
+
+    if (
+      url.hostname !== "127.0.0.1" &&
+      url.hostname !== "localhost"
+    ) {
+      return false;
+    }
+
+    if (url.pathname !== "/callback") {
+      return false;
+    }
+
+    if (url.search || url.hash) {
+      return false;
+    }
+
+    const port = Number(url.port);
+
+    if (!Number.isInteger(port)) {
+      return false;
+    }
+
+    if (port < 1024 || port > 65535) {
+      return false;
+    }
+
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function isValidBase64Url(value) {
+  return (
+    typeof value === "string" &&
+    value.length >= 43 &&
+    value.length <= 128 &&
+    /^[A-Za-z0-9_-]+$/.test(value)
+  );
+}
+
 export default async function AuthorizePage({ searchParams }) {
   const params = await searchParams;
 
-  const clientId = params?.client_id;
+  /*
+   * ============================================================
+   * UNITY LAUNCHER REQUEST
+   * ============================================================
+   *
+   * Unity sends:
+   *
+   *   code_challenge
+   *   code_challenge_method
+   *   state
+   *   redirect_uri
+   *
+   * Unity does NOT send:
+   *
+   *   client_id
+   *   response_type
+   *
+   * Those are defined server-side because this endpoint belongs
+   * specifically to the PlayLive launcher.
+   */
+
   const redirectUri = params?.redirect_uri;
-  const responseType = params?.response_type;
   const codeChallenge = params?.code_challenge;
   const codeChallengeMethod = params?.code_challenge_method;
   const state = params?.state;
 
   /*
-   * Phase 1:
-   * We validate the basic OAuth/PKCE parameters here.
-   *
-   * We are NOT issuing an authorization code yet.
+   * ============================================================
+   * VALIDATE AUTHORIZATION REQUEST
+   * ============================================================
    */
 
   if (
-    !clientId ||
-    !redirectUri ||
-    responseType !== "code" ||
-    !codeChallenge ||
-    codeChallengeMethod !== "S256"
+    !isValidLoopbackRedirect(redirectUri) ||
+    !isValidBase64Url(codeChallenge) ||
+    codeChallengeMethod !== "S256" ||
+    !isValidBase64Url(state)
   ) {
     redirect("/launcher/error?reason=invalid_authorize_request");
   }
+
+  /*
+   * ============================================================
+   * SERVER-DEFINED CLIENT CONTRACT
+   * ============================================================
+   */
+
+  const clientId = LAUNCHER_CLIENT_ID;
+  const responseType = LAUNCHER_RESPONSE_TYPE;
+
+  /*
+   * ============================================================
+   * VERIFY BROWSER AUTHENTICATION
+   * ============================================================
+   */
 
   const supabase = await createClient();
 
@@ -38,29 +122,36 @@ export default async function AuthorizePage({ searchParams }) {
   } = await supabase.auth.getUser();
 
   /*
-   * User is not authenticated.
+   * ============================================================
+   * USER NOT SIGNED IN
+   * ============================================================
    *
-   * Send them to the existing sign-in page while preserving
-   * the complete authorization request.
+   * Preserve the complete authorization request so that after
+   * sign-in the user returns to this exact authorization request.
    */
 
   if (!user) {
     const query = new URLSearchParams({
-      client_id: clientId,
       redirect_uri: redirectUri,
       response_type: responseType,
+      client_id: clientId,
       code_challenge: codeChallenge,
       code_challenge_method: codeChallengeMethod,
+      state,
     });
 
-    if (state) {
-      query.set("state", state);
-    }
-
-    redirect(`/launcher/sign-in?returnTo=${encodeURIComponent(
-      `/launcher/authorize?${query.toString()}`
-    )}`);
+    redirect(
+      `/launcher/sign-in?returnTo=${encodeURIComponent(
+        `/launcher/authorize?${query.toString()}`
+      )}`
+    );
   }
+
+  /*
+   * ============================================================
+   * DISPLAY ACCOUNT
+   * ============================================================
+   */
 
   const displayName =
     user.user_metadata?.display_name ||
@@ -99,6 +190,7 @@ export default async function AuthorizePage({ searchParams }) {
 
           <div className={styles.permission}>
             <strong>Access your PlayLive account</strong>
+
             <span>
               Confirm that you are signed in to your PlayLive
               account.
@@ -107,6 +199,7 @@ export default async function AuthorizePage({ searchParams }) {
 
           <div className={styles.permission}>
             <strong>Access your game library</strong>
+
             <span>
               Allow the launcher to retrieve games associated
               with your account.
@@ -119,6 +212,12 @@ export default async function AuthorizePage({ searchParams }) {
             action="/api/v1/launcher/authorize"
             method="POST"
           >
+            {/*
+             * These values are server-defined.
+             * The user/browser cannot change the launcher client
+             * or response type.
+             */}
+
             <input
               type="hidden"
               name="client_id"
@@ -127,14 +226,14 @@ export default async function AuthorizePage({ searchParams }) {
 
             <input
               type="hidden"
-              name="redirect_uri"
-              value={redirectUri}
+              name="response_type"
+              value={responseType}
             />
 
             <input
               type="hidden"
-              name="response_type"
-              value={responseType}
+              name="redirect_uri"
+              value={redirectUri}
             />
 
             <input
@@ -149,13 +248,11 @@ export default async function AuthorizePage({ searchParams }) {
               value={codeChallengeMethod}
             />
 
-            {state && (
-              <input
-                type="hidden"
-                name="state"
-                value={state}
-              />
-            )}
+            <input
+              type="hidden"
+              name="state"
+              value={state}
+            />
 
             <button
               type="submit"
@@ -181,3 +278,4 @@ export default async function AuthorizePage({ searchParams }) {
     </main>
   );
 }
+

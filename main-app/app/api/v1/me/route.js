@@ -1,31 +1,123 @@
+
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
-export async function GET() {
+export async function GET(request) {
   try {
-    const supabase = await createClient();
+    const authorizationHeader =
+      request.headers.get("authorization");
 
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-
-    if (userError || !user) {
+    if (
+      typeof authorizationHeader !== "string" ||
+      !authorizationHeader.startsWith("Bearer ")
+    ) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
       );
     }
 
-    const { data: profile, error: profileError } =
+    const accessToken =
+      authorizationHeader.slice("Bearer ".length).trim();
+
+    if (!accessToken) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    const supabase = createAdminClient();
+
+    const { data: session, error: sessionError } =
       await supabase
-        .from("profiles")
-        .select("id, display_name")
-        .eq("id", user.id)
-        .single();
+        .from("launcher_sessions")
+        .select(
+          `
+            id,
+            user_id,
+            access_token_hash,
+            expires_at,
+            revoked_at
+          `
+        )
+        .eq(
+          "access_token_hash",
+          await hashAccessToken(accessToken)
+        )
+        .maybeSingle();
+
+    if (sessionError) {
+      console.error(
+        "ME SESSION LOOKUP ERROR:",
+        sessionError
+      );
+
+      return NextResponse.json(
+        { error: "Internal server error" },
+        { status: 500 }
+      );
+    }
+
+    if (!session) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    if (session.revoked_at) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    if (
+      new Date(session.expires_at).getTime() <=
+      Date.now()
+    ) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    const {
+      data: userData,
+      error: userError,
+    } = await supabase.auth.admin.getUserById(
+      session.user_id
+    );
+
+    if (userError || !userData?.user) {
+      console.error(
+        "ME USER FETCH ERROR:",
+        userError
+      );
+
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    const user = userData.user;
+
+    const {
+      data: profile,
+      error: profileError,
+    } = await supabase
+      .from("profiles")
+      .select("id, display_name")
+      .eq("id", user.id)
+      .single();
 
     if (profileError || !profile) {
-      console.error("PROFILE FETCH ERROR:", profileError);
+      console.error(
+        "ME PROFILE FETCH ERROR:",
+        profileError
+      );
 
       return NextResponse.json(
         { error: "Profile not found" },
@@ -37,7 +129,9 @@ export async function GET() {
       id: user.id,
       email: user.email,
       displayName: profile.display_name,
-      emailVerified: Boolean(user.email_confirmed_at),
+      emailVerified: Boolean(
+        user.email_confirmed_at
+      ),
     });
   } catch (error) {
     console.error("ME API ERROR:", error);
@@ -48,3 +142,13 @@ export async function GET() {
     );
   }
 }
+
+async function hashAccessToken(token) {
+  const crypto = await import("crypto");
+
+  return crypto
+    .createHash("sha256")
+    .update(token)
+    .digest("hex");
+}
+

@@ -16,20 +16,30 @@ export default async function AccountPage() {
     redirect("/launcher/sign-in");
   }
 
-  const metadata = user.user_metadata || {};
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select(
+      "display_name, avatar_url, terms_version, privacy_version, accepted_terms_at, created_at"
+    )
+    .eq("id", user.id)
+    .single();
+
+  if (!profile) {
+    redirect("/launcher/sign-in");
+  }
 
   const displayName =
-    metadata.display_name ||
+    profile.display_name ||
     user.email?.split("@")[0] ||
     "PlayLive User";
 
-  const createdAt = user.created_at
-    ? new Date(user.created_at).toLocaleDateString("en-GB", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      })
-    : "Unknown";
+  const createdAt = new Date(
+    profile.created_at
+  ).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 
   const emailVerified = Boolean(user.email_confirmed_at);
 

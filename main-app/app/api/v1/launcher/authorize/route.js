@@ -1,21 +1,22 @@
+
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 
 const LAUNCHER_CLIENT_ID = "playlive-launcher";
+const LAUNCHER_RESPONSE_TYPE = "code";
 
 /*
  * ============================================================
  * LOOPBACK REDIRECT VALIDATION
  * ============================================================
  *
- * OAuth native-app loopback redirects may use:
+ * Unity creates a random local callback such as:
  *
- *   http://127.0.0.1:<port>/callback
- *   http://localhost:<port>/callback
+ *   http://127.0.0.1:54321/callback
  *
- * The exact URI is still stored with the authorization code
- * and must match during token exchange.
+ * The exact URI is stored with the authorization code and must
+ * match exactly during token exchange.
  */
 
 function isValidLoopbackRedirect(redirectUri) {
@@ -76,14 +77,28 @@ function isValidBase64Url(value) {
  * ============================================================
  * POST /api/v1/launcher/authorize
  * ============================================================
+ *
+ * This endpoint is called by the authorization page after the
+ * signed-in user clicks "Continue to Launcher".
+ *
+ * IMPORTANT:
+ *
+ * We do NOT trust client_id or response_type from Unity.
+ *
+ * They are defined server-side:
+ *
+ *   client_id    = playlive-launcher
+ *   responseType = code
+ *
+ * This matches the actual Unity V7 client contract.
  */
 
 export async function POST(request) {
   try {
     /*
-     * ----------------------------------------------------------
+     * ==========================================================
      * 1. VERIFY BROWSER AUTHENTICATION
-     * ----------------------------------------------------------
+     * ==========================================================
      */
 
     const supabase = await createClient();
@@ -107,44 +122,39 @@ export async function POST(request) {
     }
 
     /*
-     * ----------------------------------------------------------
+     * ==========================================================
      * 2. READ FORM DATA
-     * ----------------------------------------------------------
+     * ==========================================================
      */
 
     const formData = await request.formData();
 
-    const clientId = formData.get("client_id");
+    /*
+     * The browser form contains these values because the
+     * authorization page generated them from the Unity request.
+     */
+
     const redirectUri = formData.get("redirect_uri");
-    const responseType = formData.get("response_type");
     const codeChallenge = formData.get("code_challenge");
     const codeChallengeMethod =
       formData.get("code_challenge_method");
     const state = formData.get("state");
 
     /*
-     * ----------------------------------------------------------
-     * 3. VALIDATE CLIENT ID
-     * ----------------------------------------------------------
+     * ==========================================================
+     * 3. SERVER-DEFINED LAUNCHER IDENTITY
+     * ==========================================================
+     *
+     * DO NOT read client_id or response_type from the request.
      */
 
-    if (clientId !== LAUNCHER_CLIENT_ID) {
-      return NextResponse.json(
-        {
-          error: "invalid_request",
-          error_description:
-            "Invalid launcher client.",
-        },
-        {
-          status: 400,
-        }
-      );
-    }
+    const clientId = LAUNCHER_CLIENT_ID;
+    const responseType = LAUNCHER_RESPONSE_TYPE;
 
     /*
-     * ----------------------------------------------------------
+     * ==========================================================
      * 4. VALIDATE RESPONSE TYPE
-     * ----------------------------------------------------------
+     * ==========================================================
      */
 
     if (responseType !== "code") {
@@ -161,9 +171,9 @@ export async function POST(request) {
     }
 
     /*
-     * ----------------------------------------------------------
+     * ==========================================================
      * 5. VALIDATE REDIRECT URI
-     * ----------------------------------------------------------
+     * ==========================================================
      */
 
     if (
@@ -183,9 +193,9 @@ export async function POST(request) {
     }
 
     /*
-     * ----------------------------------------------------------
+     * ==========================================================
      * 6. VALIDATE PKCE
-     * ----------------------------------------------------------
+     * ==========================================================
      */
 
     if (
@@ -218,9 +228,12 @@ export async function POST(request) {
     }
 
     /*
-     * ----------------------------------------------------------
+     * ==========================================================
      * 7. VALIDATE STATE
-     * ----------------------------------------------------------
+     * ==========================================================
+     *
+     * Unity generates state and requires the same state to come
+     * back in the local callback.
      */
 
     if (
@@ -240,26 +253,26 @@ export async function POST(request) {
     }
 
     /*
-     * ----------------------------------------------------------
+     * ==========================================================
      * 8. CREATE AUTHORIZATION CODE
-     * ----------------------------------------------------------
+     * ==========================================================
      */
 
     const authorizationCode =
       crypto.randomBytes(32).toString("base64url");
 
     /*
-     * ----------------------------------------------------------
+     * ==========================================================
      * 9. STORE AUTHORIZATION CODE
-     * ----------------------------------------------------------
+     * ==========================================================
      *
-     * The authorization code is bound to:
+     * The authorization code is permanently bound to:
      *
-     * - authenticated user
-     * - launcher client
-     * - exact redirect URI
-     * - PKCE challenge
-     * - PKCE method
+     *   - authenticated Supabase user
+     *   - PlayLive launcher client
+     *   - exact loopback redirect URI
+     *   - PKCE challenge
+     *   - S256 method
      *
      * It expires after 3 minutes.
      */
@@ -301,9 +314,16 @@ export async function POST(request) {
     }
 
     /*
-     * ----------------------------------------------------------
-     * 10. REDIRECT BACK TO LAUNCHER
-     * ----------------------------------------------------------
+     * ==========================================================
+     * 10. REDIRECT BACK TO UNITY
+     * ==========================================================
+     *
+     * Unity's local TCP listener receives:
+     *
+     *   /callback?code=...&state=...
+     *
+     * Unity then verifies state and exchanges the authorization
+     * code using its original PKCE verifier.
      */
 
     const callbackUrl = new URL(redirectUri);
@@ -337,3 +357,4 @@ export async function POST(request) {
     );
   }
 }
+
