@@ -1,4 +1,3 @@
-
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -29,23 +28,28 @@ export async function GET(request) {
 
     const supabase = createAdminClient();
 
-    const { data: session, error: sessionError } =
-      await supabase
-        .from("launcher_sessions")
-        .select(
-          `
-            id,
-            user_id,
-            access_token_hash,
-            expires_at,
-            revoked_at
-          `
-        )
-        .eq(
-          "access_token_hash",
-          await hashAccessToken(accessToken)
-        )
-        .maybeSingle();
+    const accessTokenHash =
+      await hashAccessToken(accessToken);
+
+    const {
+      data: session,
+      error: sessionError,
+    } = await supabase
+      .from("launcher_sessions")
+      .select(
+        `
+          id,
+          user_id,
+          access_token_hash,
+          access_expires_at,
+          revoked_at
+        `
+      )
+      .eq(
+        "access_token_hash",
+        accessTokenHash
+      )
+      .maybeSingle();
 
     if (sessionError) {
       console.error(
@@ -74,8 +78,10 @@ export async function GET(request) {
     }
 
     if (
-      new Date(session.expires_at).getTime() <=
-      Date.now()
+      !session.access_expires_at ||
+      new Date(
+        session.access_expires_at
+      ).getTime() <= Date.now()
     ) {
       return NextResponse.json(
         { error: "Unauthorized" },
@@ -86,9 +92,10 @@ export async function GET(request) {
     const {
       data: userData,
       error: userError,
-    } = await supabase.auth.admin.getUserById(
-      session.user_id
-    );
+    } =
+      await supabase.auth.admin.getUserById(
+        session.user_id
+      );
 
     if (userError || !userData?.user) {
       console.error(
@@ -151,4 +158,3 @@ async function hashAccessToken(token) {
     .update(token)
     .digest("hex");
 }
-

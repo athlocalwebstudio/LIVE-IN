@@ -1,4 +1,3 @@
-
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import crypto from "crypto";
@@ -49,7 +48,7 @@ export async function GET(request) {
         `
           id,
           user_id,
-          expires_at,
+          access_expires_at,
           revoked_at
         `
       )
@@ -86,8 +85,10 @@ export async function GET(request) {
     }
 
     if (
-      new Date(session.expires_at).getTime() <=
-      Date.now()
+      !session.access_expires_at ||
+      new Date(
+        session.access_expires_at
+      ).getTime() <= Date.now()
     ) {
       return NextResponse.json(
         { error: "Unauthorized" },
@@ -111,4 +112,3 @@ export async function GET(request) {
     );
   }
 }
-

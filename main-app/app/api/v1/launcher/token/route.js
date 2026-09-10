@@ -1,4 +1,3 @@
-import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { NextResponse } from "next/server";
 import crypto from "crypto";
@@ -101,16 +100,6 @@ export async function POST(request) {
           { status: 400 }
         );
       }
-
-      /*
-       * IMPORTANT:
-       *
-       * Token exchange happens outside the browser's
-       * authenticated Supabase session.
-       *
-       * Therefore database operations here MUST use
-       * the Supabase admin client.
-       */
 
       const supabase = createAdminClient();
 
@@ -356,6 +345,11 @@ export async function POST(request) {
       const refreshTokenHash =
         hashToken(newRefreshToken);
 
+      const accessExpiresAt = new Date(
+        Date.now() +
+          ACCESS_TOKEN_TTL_SECONDS * 1000
+      ).toISOString();
+
       const refreshExpiresAt = new Date(
         Date.now() +
           REFRESH_TOKEN_TTL_DAYS *
@@ -379,6 +373,7 @@ export async function POST(request) {
         .insert({
           user_id: authorizationCode.user_id,
           access_token_hash: accessTokenHash,
+          access_expires_at: accessExpiresAt,
           refresh_token_hash: refreshTokenHash,
           expires_at: refreshExpiresAt,
         })
@@ -517,7 +512,7 @@ export async function POST(request) {
 
       /*
        * ========================================================
-       * ROTATE REFRESH TOKEN
+       * ROTATE TOKENS
        * ========================================================
        */
 
@@ -526,6 +521,16 @@ export async function POST(request) {
 
       const rotatedRefreshTokenHash =
         hashToken(rotatedRefreshToken);
+
+      const accessToken = createToken();
+
+      const accessTokenHash =
+        hashToken(accessToken);
+
+      const newAccessExpiresAt = new Date(
+        Date.now() +
+          ACCESS_TOKEN_TTL_SECONDS * 1000
+      ).toISOString();
 
       const newRefreshExpiresAt =
         new Date(
@@ -537,13 +542,24 @@ export async function POST(request) {
               1000
         ).toISOString();
 
+      /*
+       * ========================================================
+       * ATOMIC REFRESH ROTATION
+       * ========================================================
+       */
+
       const {
+        data: rotatedSession,
         error: rotateError,
       } = await supabase
         .from("launcher_sessions")
         .update({
           refresh_token_hash:
             rotatedRefreshTokenHash,
+          access_token_hash:
+            accessTokenHash,
+          access_expires_at:
+            newAccessExpiresAt,
           expires_at:
             newRefreshExpiresAt,
           last_used_at:
@@ -553,7 +569,9 @@ export async function POST(request) {
         .eq(
           "refresh_token_hash",
           refreshTokenHash
-        );
+        )
+        .select("id")
+        .maybeSingle();
 
       if (rotateError) {
         console.error(
@@ -571,42 +589,22 @@ export async function POST(request) {
         );
       }
 
-      /*
-       * ========================================================
-       * ROTATE ACCESS TOKEN
-       * ========================================================
-       */
-
-      const accessToken = createToken();
-
-      const accessTokenHash =
-        hashToken(accessToken);
-
-      const {
-        error: accessTokenUpdateError,
-      } = await supabase
-        .from("launcher_sessions")
-        .update({
-          access_token_hash:
-            accessTokenHash,
-        })
-        .eq("id", session.id);
-
-      if (accessTokenUpdateError) {
-        console.error(
-          "TOKEN ACCESS TOKEN UPDATE ERROR:",
-          accessTokenUpdateError
-        );
-
+      if (!rotatedSession) {
         return NextResponse.json(
           {
-            error: "server_error",
+            error: "invalid_grant",
             error_description:
-              "Could not update access token.",
+              "Refresh token has already been used.",
           },
-          { status: 500 }
+          { status: 400 }
         );
       }
+
+      /*
+       * ========================================================
+       * RETURN TOKENS
+       * ========================================================
+       */
 
       return NextResponse.json({
         accessToken,
