@@ -1,4 +1,4 @@
-
+js
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import crypto from "crypto";
@@ -28,8 +28,8 @@ function isValidLoopbackRedirect(redirectUri) {
     }
 
     if (url.hostname !== "127.0.0.1") {
-  return false;
-}
+      return false;
+    }
 
     if (url.pathname !== "/callback") {
       return false;
@@ -133,8 +133,9 @@ export async function POST(request) {
 
     const redirectUri = formData.get("redirect_uri");
     const codeChallenge = formData.get("code_challenge");
-    const codeChallengeMethod =
-      formData.get("code_challenge_method");
+    const codeChallengeMethod = formData.get(
+      "code_challenge_method"
+    );
     const state = formData.get("state");
 
     /*
@@ -315,12 +316,20 @@ export async function POST(request) {
      * 10. REDIRECT BACK TO UNITY
      * ==========================================================
      *
-     * Unity's local TCP listener receives:
+     * IMPORTANT:
      *
-     *   /callback?code=...&state=...
+     * This endpoint was reached through a POST from the browser.
+     * A 307 redirect would preserve that POST method when
+     * redirecting to Unity's localhost callback.
      *
-     * Unity then verifies state and exchanges the authorization
-     * code using its original PKCE verifier.
+     * Unity's callback listener explicitly requires:
+     *
+     *   GET /callback?code=...&state=...
+     *
+     * Therefore we use 303 See Other.
+     *
+     * HTTP 303 instructs the browser to follow the redirect
+     * using GET, regardless of the original POST.
      */
 
     const callbackUrl = new URL(redirectUri);
@@ -335,7 +344,9 @@ export async function POST(request) {
       state
     );
 
-    return NextResponse.redirect(callbackUrl);
+    return NextResponse.redirect(callbackUrl, {
+      status: 303,
+    });
   } catch (error) {
     console.error(
       "POST /api/v1/launcher/authorize ERROR:",
@@ -354,4 +365,6 @@ export async function POST(request) {
     );
   }
 }
+
+
 
