@@ -96,10 +96,7 @@ export async function GET(request) {
       );
     }
 
-    return NextResponse.json({
-      subscription: null,
-      games: [],
-    });
+    return NextResponse.json([]);
   } catch (error) {
     console.error(
       "LIBRARY API ERROR:",
@@ -111,4 +108,4 @@ export async function GET(request) {
       { status: 500 }
     );
   }
-}
+} 

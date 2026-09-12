@@ -27,12 +27,9 @@ function isValidLoopbackRedirect(redirectUri) {
       return false;
     }
 
-    if (
-      url.hostname !== "127.0.0.1" &&
-      url.hostname !== "localhost"
-    ) {
-      return false;
-    }
+    if (url.hostname !== "127.0.0.1") {
+  return false;
+}
 
     if (url.pathname !== "/callback") {
       return false;
