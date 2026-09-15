@@ -10,19 +10,31 @@ export default async function AccountPage() {
 
   const {
     data: { user },
+    error: userError,
   } = await supabase.auth.getUser();
+
+  console.log("ACCOUNT AUTH DEBUG:", {
+    userId: user?.id,
+    email: user?.email,
+    userError: userError?.message,
+  });
 
   if (!user) {
     redirect("/launcher/sign-in");
   }
 
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select(
       "display_name, avatar_url, terms_version, privacy_version, accepted_terms_at, created_at"
     )
     .eq("id", user.id)
     .single();
+
+  console.log("ACCOUNT PROFILE DEBUG:", {
+    profile,
+    profileError: profileError?.message,
+  });
 
   if (!profile) {
     redirect("/launcher/sign-in");
@@ -285,4 +297,3 @@ export default async function AccountPage() {
     </main>
   );
 }
-
