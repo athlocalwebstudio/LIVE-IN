@@ -1,8 +1,7 @@
-
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
-export async function POST() {
+export async function POST(request) {
   const supabase = await createClient();
 
   const { error } = await supabase.auth.signOut();
@@ -20,7 +19,7 @@ export async function POST() {
     );
   }
 
-  return NextResponse.redirect(
-    new URL("/launcher/sign-in", process.env.NEXT_PUBLIC_SITE_URL)
-  );
+  const url = new URL("/launcher/sign-in", request.url);
+
+  return NextResponse.redirect(url);
 }
